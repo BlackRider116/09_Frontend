@@ -1,6 +1,9 @@
 // const baseUrl = 'https://blackrider116-express-api.herokuapp.com';
 const baseUrl = 'http://localhost:9999';
 
+let firstSeenId = 0;
+let lastSeenId = 0;
+
 const rootEl = document.getElementById('root');
 
 const addFormEl = document.createElement('form');
@@ -52,7 +55,7 @@ addFormEl.addEventListener('submit', function (ev) {
         linkEl.value = '';
         typeEl.value = 'regular';
         localStorage.clear();
-        rebuildList(postsEl, data);
+        rebuildList(postsEl, data.reverse());
     }).catch(error => {
         console.log(error)
     });
@@ -69,7 +72,7 @@ promise.then(response => {
     }
     return response.json();
 }).then (data => {
-    rebuildList(postsEl, data);
+    rebuildList(postsEl, data.reverse());
 }).catch(error => {
     console.log(error)
 });
@@ -130,7 +133,7 @@ function rebuildList(containerEl, items) {
                 }
                 return response.json();
             }).then(data => {
-                rebuildList(postsEl, data);
+                rebuildList(postsEl, data.reverse());
             }).catch(error => {
                 console.log(error)
             });
@@ -145,7 +148,7 @@ function rebuildList(containerEl, items) {
                 }
                 return response.json();
             }).then(data => {
-                rebuildList(postsEl, data);
+                rebuildList(postsEl, data.reverse());
             }).catch(error => {
                 console.log(error)
             });
@@ -160,13 +163,17 @@ function rebuildList(containerEl, items) {
                 }
                 return response.json();
             }).then(data => {
-                rebuildList(postsEl, data);
+                rebuildList(postsEl, data.reverse());
             }).catch(error => {
                 console.log(error)
             });
         });
-
         containerEl.appendChild(postEl);
     }
 };
 
+const addOldPostsButtonEl = document.createElement('button');
+addOldPostsButtonEl.className = 'btn btn-primary d-block mx-auto mt-2';
+addOldPostsButtonEl.innerHTML = 'Показать еще посты';
+// addOldPostsButtonEl.addEventListener('click', addOldPosts)
+rootEl.appendChild(addOldPostsButtonEl);
