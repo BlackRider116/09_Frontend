@@ -1,7 +1,5 @@
-import {Api} from './lib.js';
-
-// const api = new Api('https://blackrider116-express-api.herokuapp.com');
-const api = new Api('http://localhost:9999');
+// const baseUrl = 'https://blackrider116-express-api.herokuapp.com';
+const baseUrl = 'http://localhost:9999';
 
 const rootEl = document.getElementById('root');
 
@@ -27,7 +25,7 @@ linkEl.addEventListener('input', (evt) => {
     localStorage.setItem('content', evt.currentTarget.value);
 });
 if (localStorage.getItem('type') !== null) {
-typeEl.value = localStorage.getItem('type');
+    typeEl.value = localStorage.getItem('type');
 }
 typeEl.addEventListener('input', (evt) => {
     localStorage.setItem('type', evt.currentTarget.value);
@@ -41,24 +39,39 @@ addFormEl.addEventListener('submit', function (ev) {
         content: linkEl.value,
         type: typeEl.value,
     };
-    api.postJSON('/posts', post, data => {
+    fetch(`${baseUrl}/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(post)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    }).then(data => {
+        linkEl.value = '';
+        typeEl.value = 'regular';
+        localStorage.clear();
         rebuildList(postsEl, data);
-    }, error => {
+    }).catch(error => {
         console.log(error)
     });
-    linkEl.value = '';
-    typeEl.value = 'regular';
-    localStorage.clear();
 });
 rootEl.appendChild(addFormEl);
 
 const postsEl = document.createElement('div');
 rootEl.appendChild(postsEl);
 
-api.getJSON('/posts', data => {
+const promise = fetch(`${baseUrl}/posts`);
+promise.then(response => {
+    if (!response.ok) {
+        throw new Error(response.statusText);
+    }
+    return response.json();
+}).then (data => {
     rebuildList(postsEl, data);
-}, error => {
-    console.log(error);
+}).catch(error => {
+    console.log(error)
 });
 
 function rebuildList(containerEl, items) {
@@ -108,26 +121,48 @@ function rebuildList(containerEl, items) {
             `;
         };
 
-        postEl.querySelector('[data-action=delete]').addEventListener('click', function() {
-            api.deleteJSON(`/posts/${item.id}`, null, data => {
+        postEl.querySelector('[data-action=delete]').addEventListener('click', function () {
+            fetch(`${baseUrl}/posts/${item.id}`, {
+                method: 'DELETE',
+                   }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            }).then(data => {
                 rebuildList(postsEl, data);
-            }, error => {
-                console.log(error);
+            }).catch(error => {
+                console.log(error)
+            });
+        });
+     
+        postEl.querySelector('[data-action=like]').addEventListener('click', function () {
+            fetch(`${baseUrl}/posts/${item.id}/likes`, {
+                method: 'POST',
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            }).then(data => {
+                rebuildList(postsEl, data);
+            }).catch(error => {
+                console.log(error)
             });
         });
 
-        postEl.querySelector('[data-action=like]').addEventListener('click', function() {
-            api.postJSON(`/posts/${item.id}/likes`, null, data => {
+        postEl.querySelector('[data-action=dislike]').addEventListener('click', function () {
+            fetch(`${baseUrl}/posts/${item.id}/likes`, {
+                method: 'DELETE',
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            }).then(data => {
                 rebuildList(postsEl, data);
-            }, error => {
-                console.log(error);
-            });
-        });
-        postEl.querySelector('[data-action=dislike]').addEventListener('click', function() {
-            api.deleteJSON(`/posts/${item.id}/likes`, null, data => {
-                rebuildList(postsEl, data);
-            }, error => {
-                console.log(error);
+            }).catch(error => {
+                console.log(error)
             });
         });
 
