@@ -3,7 +3,6 @@ const baseUrl = 'https://backend-09-server.herokuapp.com';
 
 let firstSeenId = 0;
 let lastSeenId = 0;
-console.log(lastSeenId)
 
 const rootEl = document.getElementById('root');
 
@@ -186,43 +185,29 @@ const lastPosts = document.createElement('button');
 lastPosts.className = 'btn btn-primary d-block mx-auto mt-2';
 lastPosts.innerHTML = 'Показать еще посты';
 lastPosts.addEventListener('click', function () {
-    fetch(`${baseUrl}/posts/${lastSeenId}`)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-        return response.json();
-    }).then(data => {
-        // console.log(data.length)
-        if (data.length !== 0) {
-            lastSeenId = data[data.length - 1].id;
-            rebuildList(postsEl, data.reverse())
-            // console.log(lastSeenId)
-        }
-    }).catch(error => {
-        console.log(error);
-    });
+    fetch(`${baseUrl}/posts/seenPosts/${lastSeenId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+            return response.json();
+        }).then(function (data) {
+
+            if ((lastSeenId === 0 || lastSeenId > 5) && data.length !== 0) {
+                lastSeenId = data[data.length - 5].id;
+                rebuildList(postsEl, data.reverse());
+                console.log(lastSeenId)
+
+            } else if (lastSeenId <= 5 && data.length !== 0) {
+                lastSeenId = data[data.length - 1].id;
+                rebuildList(postsEl, data.reverse());
+                console.log(lastSeenId)
+            }            
+            lastPosts.textContent = 'Постов больше нет';
+        }).catch(error => {
+            console.log(error);
+        });
 })
 rootEl.appendChild(lastPosts);
-
-
-
-// function lastPost() {
-//     fetch(`${baseUrl}/posts/${lastSeenId}`)
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error(response.statusText);
-//         }
-//         return response.json();
-//     }).then(data => {
-//         if (data.length !== 0) {
-//             lastSeenId = data[data.length - 1].id;
-//             rebuildList(postsEl, data.reverse())
-//             // console.log(lastSeenId)
-//         }
-//     }).catch(error => {
-//         console.log(error);
-//     });
-// };
 
 
