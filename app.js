@@ -2,7 +2,10 @@ const baseUrl = 'https://backend-09-server.herokuapp.com';
 // const baseUrl = 'http://localhost:9999';
 
 let firstSeenId = 0;
+let seenId = 0;
 let lastSeenId = 0;
+
+let lastPosts = [];
 
 const rootEl = document.getElementById('root');
 
@@ -23,8 +26,23 @@ addFormEl.innerHTML = `
   </div>
 </form>
 `;
-
 rootEl.appendChild(addFormEl);
+
+
+const newPostsBtn = document.createElement('button');
+newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';;
+newPostsBtn.innerHTML = 'Показать свежие посты';
+newPostsBtn.addEventListener('click', (ev) => {
+    
+});
+// setInterval(() => {
+//     if (seenId < firstSeenId) {
+        rootEl.appendChild(newPostsBtn);
+//     }
+// console.log(seenId + '  seenId')
+// console.log(firstSeenId + "  firstSeenId")
+// }, 5000);
+
 
 const linkEl = addFormEl.querySelector('[data-id=link]');
 const typeEl = addFormEl.querySelector('[data-id=type]');
@@ -70,19 +88,29 @@ addFormEl.addEventListener('submit', function (ev) {
 const postsEl = document.createElement('div');
 rootEl.appendChild(postsEl);
 
-// const promise = fetch(`${baseUrl}/posts`);
-// promise.then(response => {
-//     if (!response.ok) {
-//         throw new Error(response.statusText);
-//     }
-//     return response.json();
-// }).then (data => {
-//     rebuildList(postsEl, data.reverse());
-// }).catch(error => {
-//     console.log(error)
-// });
+const startGet = fetch(`${baseUrl}/posts/seenPosts/${lastSeenId}`)
+startGet.then(response => {
+    if (!response.ok) {
+        throw new Error(response.statusText);
+    }
+    return response.json();
+}).then(function (data) {
+    seenId = data[data.length - 1].id;
+    
+    if (data.length !== 0) {
+        lastSeenId = data[data.length - 5].id;
+        lastPosts.push(...data.reverse())
+        rebuildList(postsEl, lastPosts)
+    }
+
+}).catch(error => {
+    console.log(error);
+});
+
+
 
 function rebuildList(containerEl, items) {
+    // console.log(items)
     containerEl.innerHTML = '';
     for (const item of items) {
         const postEl = document.createElement('div');
@@ -142,7 +170,8 @@ function rebuildList(containerEl, items) {
                 }
                 return response.json();
             }).then(data => {
-                rebuildList(postsEl, data.reverse());
+                rebuildList(postsEl, lastPosts);
+                return;
             }).catch(error => {
                 console.log(error)
             });
@@ -172,7 +201,20 @@ function rebuildList(containerEl, items) {
                 }
                 return response.json();
             }).then(data => {
-                rebuildList(postsEl, data.reverse());
+                // console.table(lastPosts)
+                // console.log(lastPosts, item.id)
+                // console.log(data, item.id, item.likes)
+                // lastPosts.likes.push(data)
+                // console.log(data.length)
+                console.log(lastPost.includes(data))
+                // lastPosts[item.id].likes = data
+                // lastPosts.some(id => {
+                //     if (id == data[id])
+                    // console.log(lastPosts[item])
+                // })
+                
+                // rebuildList(postsEl, data);
+
             }).catch(error => {
                 console.log(error)
             });
@@ -181,10 +223,20 @@ function rebuildList(containerEl, items) {
     }
 };
 
-const lastPosts = document.createElement('button');
-lastPosts.className = 'btn btn-primary d-block mx-auto mt-2';
-lastPosts.innerHTML = 'Показать еще посты';
-lastPosts.addEventListener('click', function () {
+
+// function findPostIndexById(id) {
+//     return posts.findIndex(o => {
+//         console.log(id)
+//         console.log(o.id)
+//         o.id === id
+//     });   
+// }
+
+
+const lastPostsBtn = document.createElement('button');
+lastPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
+lastPostsBtn.innerHTML = 'Показать еще посты';
+lastPostsBtn.addEventListener('click', function () {
     fetch(`${baseUrl}/posts/seenPosts/${lastSeenId}`)
         .then(response => {
             if (!response.ok) {
@@ -193,21 +245,51 @@ lastPosts.addEventListener('click', function () {
             return response.json();
         }).then(function (data) {
 
-            if ((lastSeenId === 0 || lastSeenId > 5) && data.length !== 0) {
+            if (lastSeenId > 6 && data.length !== 0) {
                 lastSeenId = data[data.length - 5].id;
-                rebuildList(postsEl, data.reverse());
-                console.log(lastSeenId)
+                lastPosts.push(...data.reverse())
 
-            } else if (lastSeenId <= 5 && data.length !== 0) {
+            } else if (lastSeenId <= 6 && data.length !== 0) {
                 lastSeenId = data[data.length - 1].id;
-                rebuildList(postsEl, data.reverse());
-                console.log(lastSeenId)
-            }            
-            lastPosts.textContent = 'Постов больше нет';
+                lastPosts.push(...data.reverse())
+                lastPostsBtn.remove();
+            } 
+           rebuildList(postsEl, lastPosts)
         }).catch(error => {
             console.log(error);
         });
 })
-rootEl.appendChild(lastPosts);
+rootEl.appendChild(lastPostsBtn);
+
+
+setInterval(() => {
+    const promise = fetch(`${baseUrl}/posts/${seenId}/${firstSeenId}`)
+        promise.then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+            return response.json();
+        }).then(function (data) {
+            console.log(data)
+            if (data.length !== 0) {
+                lastPosts = [...data]
+            
+            // firstSeenId = data[data.length - 1].id;
+            // console.log(firstSeenId)
+            // if (data.length !== 0) {
+            //     lastSeenId = data[data.length - 5].id;
+            //     lastPosts.push(...data.reverse())
+            //     rebuildList(postsEl, lastPosts)
+            // }
+            firstSeenId = data[data.length - 1].id;
+           
+            console.log(seenId + '  seenId')
+            console.log(firstSeenId + "  firstSeenId")
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+}, 5000 )
+
 
 
