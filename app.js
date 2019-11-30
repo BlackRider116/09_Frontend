@@ -329,6 +329,7 @@ lastPostsBtn.addEventListener('click', function () {
 rootEl.appendChild(lastPostsBtn);
 
 
+
 // setInterval(() => {
 //     const promise = fetch(`${baseUrl}/posts/${seenId}/${firstSeenId}`)
 //         promise.then(response => {
