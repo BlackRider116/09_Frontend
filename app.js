@@ -203,7 +203,8 @@ function rebuildList(containerEl, items) {
             }).then(data => {
                 // console.table(lastPosts)
                 // console.log(lastPosts, item.id)
-                // console.log(data, item.id, item.likes)
+                console.log(data);
+                console.log(data.likes);
                 // lastPosts.likes.push(data)
                 // console.log(data.length)
                 console.log(lastPost.includes(data))
