@@ -1,5 +1,5 @@
-// const baseUrl = 'https://backend-09-server.herokuapp.com';
-const baseUrl = 'http://localhost:9999';
+const baseUrl = 'https://backend-09-server.herokuapp.com';
+// const baseUrl = 'http://localhost:9999';
 
 let firstSeenId = 0;
 let seenId = 0;
@@ -33,11 +33,11 @@ const newPostsBtn = document.createElement('button');
 newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';;
 newPostsBtn.innerHTML = 'Показать свежие посты';
 newPostsBtn.addEventListener('click', (ev) => {
-    
+
 });
 // setInterval(() => {
 //     if (seenId < firstSeenId) {
-        rootEl.appendChild(newPostsBtn);
+rootEl.appendChild(newPostsBtn);
 //     }
 // console.log(seenId + '  seenId')
 // console.log(firstSeenId + "  firstSeenId")
@@ -78,8 +78,7 @@ addFormEl.addEventListener('submit', function (ev) {
         linkEl.value = '';
         typeEl.value = 'regular';
         localStorage.clear();
-        lastPosts.push(...data)
-        console.log(lastPosts)
+        lastPosts.unshift(data);
         rebuildList(postsEl, lastPosts);
     }).catch(error => {
         console.log(error)
@@ -97,14 +96,20 @@ startGet.then(response => {
     }
     return response.json();
 }).then(function (data) {
-    seenId = data[data.length - 1].id;
-    
-    if (data.length !== 0) {
-        lastSeenId = data[data.length - 5].id;
-        lastPosts.push(...data.reverse())
+    if(data.length === 0) {
+        lastPostsBtn.remove();
+    } else {
+        if (data.length < 5) {
+            // lastSeenId = data[data.length - 1].id;
+            lastPosts.push(...data.reverse());
+            lastPostsBtn.remove();
+        } else {
+            lastSeenId = data[data.length - 5].id;
+            lastPosts.push(...data.reverse());
+        }
         rebuildList(postsEl, lastPosts)
+        console.log(lastPosts.length)
     }
-
 }).catch(error => {
     console.log(error);
 });
@@ -163,141 +168,74 @@ function rebuildList(containerEl, items) {
             `;
         };
 
-        // postEl.querySelector('[data-action=delete]').addEventListener('click', function () {
-        //     fetch(`${baseUrl}/posts/${item.id}`, {
-        //         method: 'DELETE',
-        //            }).then(response => {
-        //         if (!response.ok) {
-        //             throw new Error(response.statusText);
-        //         }
-        //         return response.json();
-        //     }).then(data => {
-        //         rebuildList(postsEl, lastPosts);
-        //         return;
-        //     }).catch(error => {
-        //         console.log(error)
-        //     });
-        // });
-     
-        // postEl.querySelector('[data-action=like]').addEventListener('click', function () {
-        //     fetch(`${baseUrl}/posts/${item.id}/likes`, {
-        //         method: 'POST',
-        //     }).then(response => {
-        //         if (!response.ok) {
-        //             throw new Error(response.statusText);
-        //         }
-        //         return response.json();
-        //     }).then(data => {
-        //         rebuildList(postsEl, data.reverse());
-        //     }).catch(error => {
-        //         console.log(error)
-        //     });
-        // });
+        postEl.querySelector('[data-action=delete]').addEventListener('click', function () {
+            fetch(`${baseUrl}/posts/${item.id}`, {
+                method: 'DELETE',
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            }).then(data => {
+                const index = lastPosts.findIndex((post) => {
+                    return post.id === item.id
+                })
+                lastPosts.splice(index, 1)
+                rebuildList(postsEl, lastPosts);
+            }).catch(error => {
+                console.log(error)
+            });
+        });
 
-        // postEl.querySelector('[data-action=dislike]').addEventListener('click', function () {
-        //     fetch(`${baseUrl}/posts/${item.id}/likes`, {
-        //         method: 'DELETE',
-        //     }).then(response => {
-        //         if (!response.ok) {
-        //             throw new Error(response.statusText);
-        //         }
-        //         return response.json();
-        //     }).then(data => {
-        //         // if (item.id === data.id) {
-        //         //     console.log(lastPosts.indexOf(item))
-        //         //     if (lastPosts.indexOf(item.id) !== -1){
-        //         //         item = data
-        //         //     };
-        //         // };
+        postEl.querySelector('[data-action=like]').addEventListener('click', function () {
+            fetch(`${baseUrl}/posts/${item.id}/likes`, {
+                method: 'POST',
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            }).then(data => {
+                const index = lastPosts.findIndex((post) => {
+                    return post.id === item.id
+                })
+                lastPosts[index].likes++
+                rebuildList(postsEl, lastPosts);
+            }).catch(error => {
+                console.log(error)
+            });
+        });
 
-        //      //НЕ МОГУ ЭТУ БАЙДУ ЗАСТАВИТЬ РАБОТАТЬ. item = data -> ошибка; lastPosts = data -> ошибка; lastPosts.push(data) -> +100500 записей к массиву
-
-        //         // const dis = lastPosts.indexOf(item =>{
-        //         //     console.log('true')
-        //         //     return item === data;
-        //         // })
-        //         // console.log(dis)
-        //         // item = data
-        //         // console.log(item)
-        //         // console.log(data)
-        //         console.log(lastPosts)
-        //         // item = data
-        //         // console.table(lastPosts)
-        //         // console.log(lastPosts, item.id)
-        //         // console.log(data, item.id, item.likes)
-        //         // lastPosts.likes.push(data)
-        //         // console.log(data.length)
-        //         // console.log(lastPost.includes(data))
-        //         // lastPosts[item.id].likes = data
-        //         // lastPosts.some(id => {
-        //         //     if (id == data[id])
-        //             // console.log(lastPosts[item])
-        //         // })
-                
-        //         rebuildList(postsEl, lastPosts);
-
-        //     }).catch(error => {
-        //         console.log(error)
-        //     });
-        // });
+        postEl.querySelector('[data-action=dislike]').addEventListener('click', function () {
+            fetch(`${baseUrl}/posts/${item.id}/likes`, {
+                method: 'DELETE',
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            }).then(data => {
+                const index = lastPosts.findIndex((post) => {
+                    return post.id === item.id
+                })
+                lastPosts[index].likes--
+                rebuildList(postsEl, lastPosts);
+            }).catch(error => {
+                console.log(error)
+            });
+        });
         containerEl.appendChild(postEl);
     }
 };
 
-// postEl.querySelector('[data-action=dislike]').addEventListener('click', function () {
-//     fetch(`${baseUrl}/posts/${item.id}/likes`, {
-//         method: 'DELETE',
-//     }).then(response => {
-//         if (!response.ok) {
-//             throw new Error(response.statusText);
-//         }
-//         return response.json();
-//     }).then(data => {
-//         // if (item.id === data.id) {
-//         //     console.log(lastPosts.indexOf(item))
-//         //     if (lastPosts.indexOf(item.id) !== -1){
-//         //         item = data
-//         //     };
-//         // };
 
-//      //НЕ МОГУ ЭТУ БАЙДУ ЗАСТАВИТЬ РАБОТАТЬ. item = data -> ошибка; lastPosts = data -> ошибка; lastPosts.push(data) -> +100500 записей к массиву
-
-//         // const dis = lastPosts.indexOf(item =>{
-//         //     console.log('true')
-//         //     return item === data;
-//         // })
-//         // console.log(dis)
-//         // item = data
-//         // console.log(item)
-//         // console.log(data)
-//         console.log(lastPosts)
-//         // item = data
-//         // console.table(lastPosts)
-//         // console.log(lastPosts, item.id)
-//         // console.log(data, item.id, item.likes)
-//         // lastPosts.likes.push(data)
-//         // console.log(data.length)
-//         // console.log(lastPost.includes(data))
-//         // lastPosts[item.id].likes = data
-//         // lastPosts.some(id => {
-//         //     if (id == data[id])
-//             // console.log(lastPosts[item])
-//         // })
-        
-//         rebuildList(postsEl, lastPosts);
-
-//     }).catch(error => {
-//         console.log(error)
-//     });
-//     rebuildList(postsEl, lastPosts)
-// });
-// // function findPostIndexById(id) {
-// //     return posts.findIndex(o => {
-// //         console.log(id)
-// //         console.log(o.id)
-// //         o.id === id
-// //     });   
-// // }
+// function findPostIndexById(id) {
+//     return posts.findIndex(o => {
+//         console.log(id)
+//         console.log(o.id)
+//         o.id === id
+//     });   
+// }
 
 
 const lastPostsBtn = document.createElement('button');
@@ -311,23 +249,23 @@ lastPostsBtn.addEventListener('click', function () {
             }
             return response.json();
         }).then(function (data) {
-
-            if (lastSeenId > 6 && data.length !== 0) {
-                lastSeenId = data[data.length - 5].id;
-                lastPosts.push(...data.reverse())
-
-            } else if (lastSeenId <= 6 && data.length !== 0) {
+            if (data.length !== 0) {
+            if (lastSeenId <= 5) {
                 lastSeenId = data[data.length - 1].id;
                 lastPosts.push(...data.reverse())
                 lastPostsBtn.remove();
-            } 
-           rebuildList(postsEl, lastPosts)
+            } else if (lastSeenId <= 6 && data.length !== 0) {
+                lastSeenId = data[data.length - 5].id;
+                lastPosts.push(...data.reverse()) 
+            }
+            rebuildList(postsEl, lastPosts)
+            console.log(lastPosts)
+        }
         }).catch(error => {
             console.log(error);
         });
 })
 rootEl.appendChild(lastPostsBtn);
-
 
 
 // setInterval(() => {
@@ -341,7 +279,7 @@ rootEl.appendChild(lastPostsBtn);
 //             console.log(data)
 //             if (data.length !== 0) {
 //                 lastPosts = [...data]
-            
+
 //             // firstSeenId = data[data.length - 1].id;
 //             // console.log(firstSeenId)
 //             // if (data.length !== 0) {
@@ -350,7 +288,7 @@ rootEl.appendChild(lastPostsBtn);
 //             //     rebuildList(postsEl, lastPosts)
 //             // }
 //             firstSeenId = data[data.length - 1].id;
-           
+
 //             console.log(seenId + '  seenId')
 //             console.log(firstSeenId + "  firstSeenId")
 //             }
@@ -358,6 +296,3 @@ rootEl.appendChild(lastPostsBtn);
 //             console.log(error);
 //         });
 // }, 5000 )
-
-
-
