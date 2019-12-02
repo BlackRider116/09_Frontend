@@ -215,11 +215,29 @@ function rebuildList(containerEl, items) {
                 }
                 return response.json();
             }).then(data => {
+<<<<<<< HEAD
                 const index = lastPosts.findIndex((post) => {
                     return post.id === item.id
                 })
                 lastPosts[index].likes--
                 rebuildList(postsEl, lastPosts);
+=======
+                // console.table(lastPosts)
+                // console.log(lastPosts, item.id)
+                console.log(data);
+                console.log(data.likes);
+                // lastPosts.likes.push(data)
+                // console.log(data.length)
+                console.log(lastPost.includes(data))
+                // lastPosts[item.id].likes = data
+                // lastPosts.some(id => {
+                //     if (id == data[id])
+                    // console.log(lastPosts[item])
+                // })
+                
+                // rebuildList(postsEl, data);
+
+>>>>>>> f481f89144a5495e9ad7053c0c9f76d1bf6064bd
             }).catch(error => {
                 console.log(error)
             });
