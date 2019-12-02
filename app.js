@@ -96,7 +96,7 @@ startGet.then(response => {
     }
     return response.json();
 }).then(function (data) {
-    if(data.length === 0) {
+    if (data.length === 0) {
         lastPostsBtn.remove();
     } else {
         if (data.length < 5) {
@@ -117,7 +117,6 @@ startGet.then(response => {
 
 
 function rebuildList(containerEl, items) {
-    // console.log(items)
     containerEl.innerHTML = '';
     for (const item of items) {
         const postEl = document.createElement('div');
@@ -199,7 +198,7 @@ function rebuildList(containerEl, items) {
                 const index = lastPosts.findIndex((post) => {
                     return post.id === item.id
                 })
-                lastPosts[index].likes++
+                lastPosts[index].likes++;
                 rebuildList(postsEl, lastPosts);
             }).catch(error => {
                 console.log(error)
@@ -215,29 +214,11 @@ function rebuildList(containerEl, items) {
                 }
                 return response.json();
             }).then(data => {
-<<<<<<< HEAD
                 const index = lastPosts.findIndex((post) => {
                     return post.id === item.id
                 })
-                lastPosts[index].likes--
+                lastPosts[index].likes--;
                 rebuildList(postsEl, lastPosts);
-=======
-                // console.table(lastPosts)
-                // console.log(lastPosts, item.id)
-                console.log(data);
-                console.log(data.likes);
-                // lastPosts.likes.push(data)
-                // console.log(data.length)
-                console.log(lastPost.includes(data))
-                // lastPosts[item.id].likes = data
-                // lastPosts.some(id => {
-                //     if (id == data[id])
-                    // console.log(lastPosts[item])
-                // })
-                
-                // rebuildList(postsEl, data);
-
->>>>>>> f481f89144a5495e9ad7053c0c9f76d1bf6064bd
             }).catch(error => {
                 console.log(error)
             });
@@ -268,17 +249,17 @@ lastPostsBtn.addEventListener('click', function () {
             return response.json();
         }).then(function (data) {
             if (data.length !== 0) {
-            if (lastSeenId <= 5) {
-                lastSeenId = data[data.length - 1].id;
-                lastPosts.push(...data.reverse())
-                lastPostsBtn.remove();
-            } else if (lastSeenId <= 6 && data.length !== 0) {
-                lastSeenId = data[data.length - 5].id;
-                lastPosts.push(...data.reverse()) 
+                if (lastSeenId <= 5) {
+                    lastSeenId = data[data.length - 1].id;
+                    lastPosts.push(...data.reverse())
+                    lastPostsBtn.remove();
+                } else if (lastSeenId <= 6 && data.length !== 0) {
+                    lastSeenId = data[data.length - 5].id;
+                    lastPosts.push(...data.reverse())
+                }
+                rebuildList(postsEl, lastPosts)
+                console.log(lastPosts)
             }
-            rebuildList(postsEl, lastPosts)
-            console.log(lastPosts)
-        }
         }).catch(error => {
             console.log(error);
         });
