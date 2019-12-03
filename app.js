@@ -1,10 +1,8 @@
-const baseUrl = 'https://backend-09-server.herokuapp.com';
-// const baseUrl = 'http://localhost:9999';
+// const baseUrl = 'https://backend-09-server.herokuapp.com';
+const baseUrl = 'http://localhost:9999';
 
 let firstSeenId = 0;
 let lastSeenId = 0;
-
-let openBtn=false;
 
 let lastPosts = [];
 
@@ -243,203 +241,48 @@ lastPostsBtn.addEventListener('click', function () {
 rootEl.appendChild(lastPostsBtn);
 
 
-
-
-
-// const newPostsBtn = document.createElement('button');
-// newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';;
-// newPostsBtn.textContent = 'Показать свежие посты';
-// newPostsBtn.addEventListener('click', (ev) => {
-//     fetch(`${baseUrl}/posts/${firstSeenId}`)
-//         .then(response => {
-//             if (!response.ok) {
-//                 throw new Error(response.statusText);
-//             }
-//             return response.json();
-//         }).then(function (data) {
-//             firstSeenId = 0;
-//             lastPosts.unshift(...data.reverse());
-//             rebuildList(postsEl, lastPosts);
-//             newPostsBtn.remove();
-//         }).catch(error => {
-//             console.log(error);
-//         });
-
-// });
-// rootEl.appendChild(newPostsBtn);
-
-
-
-
-
-
-
-
-
-
-
-
-
-setInterval(() => {
-    if(openBtn === false) {
-    const promise = fetch(`${baseUrl}/posts/${firstSeenId}`)
-    promise.then(response => {
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-        return response.json();
-    }).then(function (data) {
-           if (data.length === 0) {
-            console.log('Новых постов нет');
-            openBtn = false;
-        }
-        else {
-            
-            if (firstSeenId === 0) {
-                firstSeenId = data[data.length - 1].id;
-                console.log('firstSeenId === 0')
-            } else {
-                openBtn=true;
+const newPost = setInterval(() => {
+        const promise = fetch(`${baseUrl}/posts/${firstSeenId}`)
+        promise.then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
             }
-        }
-        console.log(data)
-        console.log('firstSeenId = ' + firstSeenId)
-        console.log(openBtn)
-        console.log('============================================')
-    }).catch(error => {
-        console.log(error);
-    });
-    }
-   
+            return response.json();
+        }).then(function (data) {
+            if (data.length === 0) {
+                console.log('Новых постов нет');
+            }
+            else {
 
-}, 2000);
+                if (firstSeenId === 0) {
+                    firstSeenId = data[data.length - 1].id;
+                } else {
+                    const newPostsBtn = document.createElement('button');
+                    newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
+                    newPostsBtn.textContent = 'Показать свежие посты';
+                    newPostsBtn.addEventListener('click', (ev) => {
+                        fetch(`${baseUrl}/posts/${firstSeenId}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(response.statusText);
+                                }
+                                return response.json();
+                            }).then(function (data) {
+                                firstSeenId = 0;
+                                lastPosts.unshift(...data.reverse());
+                                rebuildList(postsEl, lastPosts);
+                                newPostsBtn.remove();
 
+                            }).catch(error => {
+                                console.log(error);
+                            });
 
-
-setTimeout(() => {
-    if (openBtn == true) {
-        const newPostsBtn = document.createElement('button');
-        newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
-        newPostsBtn.textContent = 'Показать свежие посты';
-        newPostsBtn.addEventListener('click', (ev) => {
-            fetch(`${baseUrl}/posts/${firstSeenId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(response.statusText);
-                    }
-                    return response.json();
-                }).then(function (data) {
-                    firstSeenId = 0;
-                    lastPosts.unshift(...data.reverse());
-                    rebuildList(postsEl, lastPosts);
-                    newPostsBtn.remove();
-                    
-                }).catch(error => {
-                    console.log(error);
-                });
-        
+                    });
+                    rootEl.appendChild(newPostsBtn);
+                    clearInterval(newPost);
+                }
+            }
+        }).catch(error => {
+            console.log(error);
         });
-        rootEl.appendChild(newPostsBtn);
-        openBtn = false;
-          }
-}, 2000);
-
-
-
-
-
-
-
-
-
-
-
-// let startTime = setInterval(() => {
-
-//     if(openBtn === false) {
-//     const promise = fetch(`${baseUrl}/posts/${firstSeenId}`)
-//     promise.then(response => {
-//         if (!response.ok) {
-//             throw new Error(response.statusText);
-//         }
-//         return response.json();
-//     }).then(function (data) {
-//            if (data.length === 0) {
-//             console.log('Новых постов нет');
-//             openBtn = false;
-//         }
-//         else {
-            
-//             if (firstSeenId === 0) {
-//                 firstSeenId = data[data.length - 1].id;
-//                 console.log('firstSeenId === 0')
-//             } else {
-//                 openBtn=true;
-//             }
-//         }
-//         console.log(data)
-//         console.log('firstSeenId = ' + firstSeenId)
-//         console.log(openBtn)
-//         console.log('============================================')
-//     }).catch(error => {
-//         console.log(error);
-//     });
-//     }
-//     else if (openBtn == true) {
-//         const newPostsBtn = document.createElement('button');
-//         newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
-//         newPostsBtn.textContent = 'Показать свежие посты';
-//         newPostsBtn.addEventListener('click', (ev) => {
-//             fetch(`${baseUrl}/posts/${firstSeenId}`)
-//                 .then(response => {
-//                     if (!response.ok) {
-//                         throw new Error(response.statusText);
-//                     }
-//                     return response.json();
-//                 }).then(function (data) {
-//                     firstSeenId = 0;
-//                     lastPosts.unshift(...data.reverse());
-//                     rebuildList(postsEl, lastPosts);
-//                     newPostsBtn.remove();
-
-//                 }).catch(error => {
-//                     console.log(error);
-//                 });
-        
-//         });
-//         rootEl.appendChild(newPostsBtn);
-//         openBtn = false;
-//        
-//         }
-
-// }, 2000)
-
-
-
-// let stopTime = setInterval(() => {  
-//     if (openBtn == true) {
-//     const newPostsBtn = document.createElement('button');
-//     newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
-//     newPostsBtn.textContent = 'Показать свежие посты';
-//     newPostsBtn.addEventListener('click', (ev) => {
-//         fetch(`${baseUrl}/posts/${firstSeenId}`)
-//             .then(response => {
-//                 if (!response.ok) {
-//                     throw new Error(response.statusText);
-//                 }
-//                 return response.json();
-//             }).then(function (data) {
-//                 firstSeenId = 0;
-//                 lastPosts.unshift(...data.reverse());
-//                 rebuildList(postsEl, lastPosts);
-//                 newPostsBtn.remove();
-//             }).catch(error => {
-//                 console.log(error);
-//             });
-    
-//     });
-//     rootEl.appendChild(newPostsBtn);
-//     openBtn = false;
-//     }
-    
-//     },2000)
+}, 3000);
