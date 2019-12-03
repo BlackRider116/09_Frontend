@@ -1,5 +1,5 @@
-// const baseUrl = 'https://backend-09-server.herokuapp.com';
-const baseUrl = 'http://localhost:9999';
+const baseUrl = 'https://backend-09-server.herokuapp.com';
+// const baseUrl = 'http://localhost:9999';
 
 let firstSeenId = 0;
 let lastSeenId = 0;
@@ -26,6 +26,29 @@ addFormEl.innerHTML = `
 </form>
 `;
 rootEl.appendChild(addFormEl);
+
+const newPostsBtn = document.createElement('button');
+newPostsBtn.className = 'btn btn-primary btn-block mt-1';
+newPostsBtn.textContent = 'Показать новые записи';
+newPostsBtn.style.display="none";
+newPostsBtn.addEventListener('click', (ev) => {
+    fetch(`${baseUrl}/posts/${firstSeenId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+            return response.json();
+        }).then(function (data) {
+            firstSeenId = 0;
+            lastPosts.unshift(...data.reverse());
+            rebuildList(postsEl, lastPosts);
+            newPostsBtn.style.display="none";
+        }).catch(error => {
+            console.log(error);
+        });
+
+});
+rootEl.appendChild(newPostsBtn);
 
 
 const linkEl = addFormEl.querySelector('[data-id=link]');
@@ -80,7 +103,6 @@ startGet.then(response => {
     }
     return response.json();
 }).then(function (data) {
-
     if (data.length === 0) {
         lastPostsBtn.remove();
     } else {
@@ -212,7 +234,7 @@ function rebuildList(containerEl, items) {
 
 
 const lastPostsBtn = document.createElement('button');
-lastPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
+lastPostsBtn.className = 'btn btn-primary btn-block mt-1';
 lastPostsBtn.textContent = 'Показать еще посты';
 lastPostsBtn.addEventListener('click', function () {
     fetch(`${baseUrl}/posts/seenPosts/${lastSeenId}`)
@@ -240,7 +262,7 @@ lastPostsBtn.addEventListener('click', function () {
 rootEl.appendChild(lastPostsBtn);
 
 
-const newPost = setInterval(() => {
+setInterval(() => {
     const promise = fetch(`${baseUrl}/posts/${firstSeenId}`)
     promise.then(response => {
         if (!response.ok) {
@@ -250,37 +272,19 @@ const newPost = setInterval(() => {
     }).then(function (data) {
         if (data.length === 0) {
             console.log('Новых постов нет');
+            newPostsBtn.style.display="none";
         }
         else {
 
             if (firstSeenId === 0) {
                 firstSeenId = data[data.length - 1].id;
+                newPostsBtn.style.display="none";
             } else {
-                const newPostsBtn = document.createElement('button');
-                newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
-                newPostsBtn.textContent = 'Показать свежие посты';
-                newPostsBtn.addEventListener('click', (ev) => {
-                    fetch(`${baseUrl}/posts/${firstSeenId}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(response.statusText);
-                            }
-                            return response.json();
-                        }).then(function (data) {
-                            firstSeenId = 0;
-                            lastPosts.unshift(...data.reverse());
-                            rebuildList(postsEl, lastPosts);
-                            newPostsBtn.remove();
-
-                        }).catch(error => {
-                            console.log(error);
-                        });
-
-                });
-                rootEl.appendChild(newPostsBtn);
-                clearInterval(newPost);
+                newPostsBtn.style.display="block";
             }
         }
+        console.log(data)
+        console.log('firstSeenId = ' + firstSeenId)
     }).catch(error => {
         console.log(error);
     });
