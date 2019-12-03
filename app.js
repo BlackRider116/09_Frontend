@@ -1,5 +1,5 @@
-// const baseUrl = 'https://backend-09-server.herokuapp.com';
-const baseUrl = 'http://localhost:9999';
+const baseUrl = 'https://backend-09-server.herokuapp.com';
+// const baseUrl = 'http://localhost:9999';
 
 let firstSeenId = 0;
 let lastSeenId = 0;
@@ -225,14 +225,16 @@ lastPostsBtn.addEventListener('click', function () {
             if (data.length !== 0) {
                 if (lastSeenId <= 5) {
                     lastSeenId = data[data.length - 1].id;
-                    lastPosts.push(...data.reverse())
-                    lastPostsBtn.remove();
+                    lastPosts.push(...data.reverse());
+                    console.log(data)
+                    // lastPostsBtn.remove();
                 } else if (lastSeenId <= 6 && data.length !== 0) {
                     lastSeenId = data[data.length - 5].id;
-                    lastPosts.push(...data.reverse())
+                    lastPosts.push(...data.reverse());
+                    
                 }
                 rebuildList(postsEl, lastPosts)
-                console.log(lastPosts)
+                
             }
         }).catch(error => {
             console.log(error);
