@@ -30,7 +30,7 @@ rootEl.appendChild(addFormEl);
 const newPostsBtn = document.createElement('button');
 newPostsBtn.className = 'btn btn-primary btn-block mt-1';
 newPostsBtn.textContent = 'Показать новые записи';
-newPostsBtn.style.display="none";
+newPostsBtn.style.display = "none";
 newPostsBtn.addEventListener('click', (ev) => {
     fetch(`${baseUrl}/posts/${firstSeenId}`)
         .then(response => {
@@ -42,7 +42,7 @@ newPostsBtn.addEventListener('click', (ev) => {
             firstSeenId = 0;
             lastPosts.unshift(...data.reverse());
             rebuildList(postsEl, lastPosts);
-            newPostsBtn.style.display="none";
+            newPostsBtn.style.display = "none";
         }).catch(error => {
             console.log(error);
         });
@@ -103,15 +103,13 @@ startGet.then(response => {
     }
     return response.json();
 }).then(function (data) {
-    if (data.length === 0) {
-        lastPostsBtn.remove();
-    } else {
+    if (data.length !== 0) {
         if (data.length < 5) {
             lastPosts.push(...data.reverse());
-            lastPostsBtn.remove();
         } else {
             lastSeenId = data[data.length - 5].id;
             lastPosts.push(...data.reverse());
+            lastPostsBtn.style.display = "block";
         }
         rebuildList(postsEl, lastPosts)
     }
@@ -236,6 +234,7 @@ function rebuildList(containerEl, items) {
 const lastPostsBtn = document.createElement('button');
 lastPostsBtn.className = 'btn btn-primary btn-block mt-1';
 lastPostsBtn.textContent = 'Показать еще посты';
+lastPostsBtn.style.display = "none";
 lastPostsBtn.addEventListener('click', function () {
     fetch(`${baseUrl}/posts/seenPosts/${lastSeenId}`)
         .then(response => {
@@ -244,14 +243,19 @@ lastPostsBtn.addEventListener('click', function () {
             }
             return response.json();
         }).then(function (data) {
-            if (data.length !== 0) {
-                if (lastSeenId <= 5) {
+            if (data.length === 0) {
+                lastPostsBtn.style.display = "none";
+            }
+            else {
+                if (data.length < 5) {
                     lastSeenId = data[data.length - 1].id;
                     lastPosts.push(...data.reverse());
-                    lastPostsBtn.remove();
+                    lastPostsBtn.style.display = "none";
                 } else {
                     lastSeenId = data[data.length - 5].id;
                     lastPosts.push(...data.reverse());
+                    lastPostsBtn.style.display = "block";
+
                 }
                 rebuildList(postsEl, lastPosts);
             }
@@ -272,15 +276,14 @@ setInterval(() => {
     }).then(function (data) {
         if (data.length === 0) {
             console.log('Новых постов нет');
-            newPostsBtn.style.display="none";
+            newPostsBtn.style.display = "none";
         }
         else {
-
             if (firstSeenId === 0) {
                 firstSeenId = data[data.length - 1].id;
-                newPostsBtn.style.display="none";
+                newPostsBtn.style.display = "none";
             } else {
-                newPostsBtn.style.display="block";
+                newPostsBtn.style.display = "block";
             }
         }
         console.log(data)
@@ -288,4 +291,4 @@ setInterval(() => {
     }).catch(error => {
         console.log(error);
     });
-}, 3000);
+}, 5000);
