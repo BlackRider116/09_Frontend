@@ -86,6 +86,7 @@ addFormEl.addEventListener('submit', function (ev) {
         typeEl.value = 'regular';
         localStorage.clear();
         lastPosts.unshift(data);
+        firstSeenId = data.id;
         rebuildList(postsEl, lastPosts);
     }).catch(error => {
         console.log(error)
@@ -291,4 +292,4 @@ setInterval(() => {
     }).catch(error => {
         console.log(error);
     });
-}, 5000);
+}, 3000);
