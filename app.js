@@ -1,5 +1,5 @@
-const baseUrl = 'https://backend-09-server.herokuapp.com';
-// const baseUrl = 'http://localhost:9999';
+// const baseUrl = 'https://backend-09-server.herokuapp.com';
+const baseUrl = 'http://localhost:9999';
 
 let firstSeenId = 0;
 let lastSeenId = 0;
@@ -226,15 +226,12 @@ lastPostsBtn.addEventListener('click', function () {
                 if (lastSeenId <= 5) {
                     lastSeenId = data[data.length - 1].id;
                     lastPosts.push(...data.reverse());
-                    console.log(data)
-                    // lastPostsBtn.remove();
-                } else if (lastSeenId <= 6 && data.length !== 0) {
+                    lastPostsBtn.remove();
+                } else {
                     lastSeenId = data[data.length - 5].id;
                     lastPosts.push(...data.reverse());
-                    
                 }
-                rebuildList(postsEl, lastPosts)
-                
+                rebuildList(postsEl, lastPosts);
             }
         }).catch(error => {
             console.log(error);
@@ -244,47 +241,47 @@ rootEl.appendChild(lastPostsBtn);
 
 
 const newPost = setInterval(() => {
-        const promise = fetch(`${baseUrl}/posts/${firstSeenId}`)
-        promise.then(response => {
-            if (!response.ok) {
-                throw new Error(response.statusText);
-            }
-            return response.json();
-        }).then(function (data) {
-            if (data.length === 0) {
-                console.log('Новых постов нет');
-            }
-            else {
+    const promise = fetch(`${baseUrl}/posts/${firstSeenId}`)
+    promise.then(response => {
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    }).then(function (data) {
+        if (data.length === 0) {
+            console.log('Новых постов нет');
+        }
+        else {
 
-                if (firstSeenId === 0) {
-                    firstSeenId = data[data.length - 1].id;
-                } else {
-                    const newPostsBtn = document.createElement('button');
-                    newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
-                    newPostsBtn.textContent = 'Показать свежие посты';
-                    newPostsBtn.addEventListener('click', (ev) => {
-                        fetch(`${baseUrl}/posts/${firstSeenId}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(response.statusText);
-                                }
-                                return response.json();
-                            }).then(function (data) {
-                                firstSeenId = 0;
-                                lastPosts.unshift(...data.reverse());
-                                rebuildList(postsEl, lastPosts);
-                                newPostsBtn.remove();
+            if (firstSeenId === 0) {
+                firstSeenId = data[data.length - 1].id;
+            } else {
+                const newPostsBtn = document.createElement('button');
+                newPostsBtn.className = 'btn btn-primary d-block mx-auto mt-2';
+                newPostsBtn.textContent = 'Показать свежие посты';
+                newPostsBtn.addEventListener('click', (ev) => {
+                    fetch(`${baseUrl}/posts/${firstSeenId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(response.statusText);
+                            }
+                            return response.json();
+                        }).then(function (data) {
+                            firstSeenId = 0;
+                            lastPosts.unshift(...data.reverse());
+                            rebuildList(postsEl, lastPosts);
+                            newPostsBtn.remove();
 
-                            }).catch(error => {
-                                console.log(error);
-                            });
+                        }).catch(error => {
+                            console.log(error);
+                        });
 
-                    });
-                    rootEl.appendChild(newPostsBtn);
-                    clearInterval(newPost);
-                }
+                });
+                rootEl.appendChild(newPostsBtn);
+                clearInterval(newPost);
             }
-        }).catch(error => {
-            console.log(error);
-        });
+        }
+    }).catch(error => {
+        console.log(error);
+    });
 }, 3000);
